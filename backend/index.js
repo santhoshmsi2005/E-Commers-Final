@@ -49,20 +49,26 @@ app.use("/admin", AdminRoutes)
 app.use("/cart", CartRoutes)
 
 app.get('/', (req, res) => {
-    res.send('Hello World!')
-})
+    res.json({
+        success: true,
+        message: 'E-Commerce Backend API is running'
+    });
+});
 
 app.use((err, req, res, next) => {
-    console.log(err);
+    console.error(err);
     
-    res.status(500).json({
+    res.status(err.status || 500).json({
         success: false,
-        message: err.message
-    })
-})
+        message: err.message || 'Internal Server Error'
+    });
+});
 
-const PORT = process.env.PORT || 3000
+if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+    const PORT = process.env.PORT || 3000;
+    app.listen(PORT, () => {
+        console.log(`Server started on port ${PORT}`);
+    });
+}
 
-app.listen(PORT, () => {
-    console.log(`Server started on port ${PORT}`)
-})
+module.exports = app;
